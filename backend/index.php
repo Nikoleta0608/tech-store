@@ -1,103 +1,109 @@
 <?php
-echo "<!DOCTYPE html>";
-echo "<html lang='en'>";
-echo "<head>";
-echo "<title>Tech Store</title>";
+$conn = new mysqli("db", "user", "password", "tech_db");
 
-echo "<style>
-body {
-    margin: 0;
-    font-family: Arial;
-    background: linear-gradient(to right, #6dd5ed, #2193b0);
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
 }
 
-h1 {
-    text-align: center;
-    padding: 20px;
-    color: white;
-    font-size: 40px;
+
+$conn->query("
+CREATE TABLE IF NOT EXISTS products (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100),
+    price INT,
+    image VARCHAR(255)
+)");
+
+
+$result = $conn->query("SELECT COUNT(*) as count FROM products");
+$row = $result->fetch_assoc();
+
+if ($row['count'] == 0) {
+    $conn->query("
+INSERT INTO products (name, price, image) VALUES
+('iPhone 17 pro', 1500, '<img src=\"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTWhNGAIKL-F35Z0JsKfKXJldMUmaZd7OWB2w&s\">'),
+('Apple Watch S10', 1300, '<img src=\"https://cdsassets.apple.com/live/7WUAS350/images/tech-specs/121202-apple-watch-series-10.png\">')
+");
 }
 
-.container {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 30px;
-    padding: 40px;
-}
-
-.product {
-    background: white;
-    width: 220px;
-    padding: 20px;
-    border-radius: 15px;
-    text-align: center;
-    box-shadow: 0px 8px 20px rgba(0,0,0,0.2);
-    transition: 0.3s;
-}
-
-.product:hover {
-    transform: scale(1.1);
-}
-
-.product h3 {
-    margin-bottom: 10px;
-}
-
-.price {
-    font-size: 18px;
-    font-weight: bold;
-    color: #2193b0;
-}
-
-button {
-    margin-top: 10px;
-    padding: 10px;
-    border: none;
-    background: #2193b0;
-    color: white;
-    border-radius: 8px;
-    cursor: pointer;
-}
-
-button:hover {
-    background: #176d8c;
-}
-</style>";
-
-echo "</head>";
-echo "<body>";
-
-echo "<h1>Tech Store</h1>";
-
-echo "<div class='container'>";
-
-echo "<div class='product'>";
-echo "<h3>iPhone 14</h3>";
-echo "<p class='price'>1500 euro</p>";
-echo "<button>Buy</button>";
-echo "</div>";
-
-echo "<div class='product'>";
-echo "<h3>Samsung Galaxy S23</h3>";
-echo "<p class='price'>1300 euro</p>";
-echo "<button>Buy</button>";
-echo "</div>";
-
-echo "<div class='product'>";
-echo "<h3>Apple Watch</h3>";
-echo "<p class='price'>800 euro</p>";
-echo "<button>Buy</button>";
-echo "</div>";
-
-echo "<div class='product'>";
-echo "<h3>Samsung Watch</h3>";
-echo "<p class='price'>600 euro</p>";
-echo "<button>Buy</button>";
-echo "</div>";
-
-echo "</div>";
-
-echo "</body>";
-echo "</html>";
+$result = $conn->query("SELECT * FROM products");
 ?>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tech Store</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #4d0044;
+            margin: 0;
+            text-align: center;
+        }
+
+        h1 {
+            background: #e8ed84;
+            color: black;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 50px;
+            flex-wrap: wrap;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            width: 220px;
+            box-shadow: 0 0 10px gray;
+            transition: 0.3s;
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+        }
+
+        .card img {
+            width: 100%;
+            border-radius: 10px;
+        }
+
+        button {
+            background: #e8ed84;
+            color: black;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: orange;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Tech Store</h1>
+
+<div class="container">
+
+<?php while($row = $result->fetch_assoc()): ?>
+    <div class="card">
+        <img src="<?= $row['image'] ?>" alt="<?= $row['name'] ?>">
+        <h2><?= $row['name'] ?></h2>
+        <p><?= $row['price'] ?> euro</p>
+        <button>Buy</button>
+    </div>
+<?php endwhile; ?>
+
+</div>
+
+</body>
+</html>
